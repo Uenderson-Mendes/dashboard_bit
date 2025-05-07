@@ -9,7 +9,7 @@ const App = () => {
 
   const fetchDados = async () => {
     try {
-      const response = await axios.get('https://api-node-dash-bitdoglab.onrender.com/dados/');
+      const response = await axios.get('https://api-node-dash-bitdoglab.vercel.app/dados');
       
       // Ordena os dados por data (mais recente primeiro)
       const dadosOrdenados = response.data.sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
