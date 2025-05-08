@@ -143,7 +143,7 @@ const App = () => {
           ) : (
             <p>Carregando gráfico...</p>
           )}
-        </div>
+        </div><br></br>
 
         {/* Linha de ID e Atualização */}
         <div className="info-line">
