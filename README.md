@@ -2,7 +2,9 @@
 # 📊 Dashboard Bit
 
 Este projeto é um painel de controle desenvolvido com **React.js**, que consome dados de uma API REST para exibir informações em tempo real. Ele foi criado como parte de um sistema embarcado, onde dispositivos como o Raspberry Pi Pico W enviam dados para a API, e o dashboard os apresenta de forma visual.
+### 🖼️ Visual do Dashboard
 
+![Dashboard Bit](https://drive.google.com/uc?export=view&id=1sbiQwXp3I91TRoywKrqNFK-HKa5BHSk1)
 ## 🌐 Demonstração
 
 A aplicação está hospedada em: [dashboard-bit.vercel.app](https://dashboard-bit.vercel.app)
@@ -147,6 +149,7 @@ Esses dados são então exibidos em tempo real no painel do dashboard.
 * Documentação oficial do [Create React App](https://facebook.github.io/create-react-app/docs/getting-started)
 * Documentação do [React](https://reactjs.org/)
 ### 🖥️ Visualização do Dashboard
+
 
 ### 🖥️ Acesse o Dashboard Interativo
 
