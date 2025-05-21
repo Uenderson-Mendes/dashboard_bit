@@ -134,7 +134,7 @@ const App = () => {
 
         {/* Gráfico de Temperatura */}
         <div id="grafico" className="grafico-container">
-          <h3>📈 Variação de Temperatura (últimos 24 registros)</h3>
+          <h3>📈 Variação de Temperatura (últimos 2 dias)</h3>
           {historico.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={historico}>
