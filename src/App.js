@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
 } from 'recharts';
-import './App.css'; // Importa o CSS externo
+import './App.css';
 
 const App = () => {
   const [dados, setDados] = useState(null);
@@ -14,18 +14,18 @@ const App = () => {
     const fetchDados = async () => {
       try {
         const response = await axios.get('https://api-node-dash-bitdoglab.vercel.app/dados');
-        const dadosOrdenados = response.data.sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
+        // Pega os 24 registros mais recentes
+        const dadosOrdenados = response.data
+          .sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em))
+          .slice(0, 24);
+
         const ultimoDado = dadosOrdenados[0];
 
         setDados(ultimoDado);
         setUltimaAtualizacao(new Date().toLocaleTimeString());
 
-        // Filtrar últimos 2 dias
-        const doisDiasAtras = new Date();
-        doisDiasAtras.setDate(doisDiasAtras.getDate() - 2);
-
+        // Prepara o histórico para o gráfico (ordem do mais antigo para o mais recente)
         const historicoFiltrado = dadosOrdenados
-          .filter(item => new Date(item.criado_em) >= doisDiasAtras)
           .map(item => ({
             temperatura: item.temperatura,
             hora: new Date(item.criado_em).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -39,7 +39,7 @@ const App = () => {
     };
 
     fetchDados();
-    const interval = setInterval(fetchDados, 1000); // Atualiza a cada 1 segundo
+    const interval = setInterval(fetchDados, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -50,12 +50,17 @@ const App = () => {
 
   return (
     <div className="app">
+      {/* Navbar */}
+      <nav className="navbar">
+        <div className="navbar-logo">🌐 Monitor BitDog</div>
+      </nav>
+
       <div className="app-container">
         <h1 className="titulo">📊 Últimos Dados do Sistema</h1>
 
         <div className="cards-container">
           {/* Card de Temperatura */}
-          <div className={`card card-temperatura ${dados ? (dados.temperatura > 30 ? 'quente' : dados.temperatura < 15 ? 'frio' : 'morno') : ''}`}>
+          <div id="temperatura" className={`card card-temperatura ${dados ? (dados.temperatura > 30 ? 'quente' : dados.temperatura < 15 ? 'frio' : 'morno') : ''}`}>
             <div className="card-header">
               <h5>Temperatura</h5>
             </div>
@@ -72,7 +77,7 @@ const App = () => {
           </div>
 
           {/* Card Joystick Direção */}
-          <div className="card-joystick-direcao">
+          <div id="joystick" className="card-joystick-direcao">
             <div className="card-headerj">Rosa dos ventos</div>
             <div className="card-body">
               {dados ? (
@@ -95,7 +100,7 @@ const App = () => {
           </div>
 
           {/* Card de Botões */}
-          <div className="card-bt">
+          <div id="botoes" className="card-bt">
             <div className="card-headerbt">
               <h5>Botões</h5>
             </div>
@@ -128,8 +133,8 @@ const App = () => {
         </div>
 
         {/* Gráfico de Temperatura */}
-        <div className="grafico-container">
-          <h3>📈 Variação de Temperatura (últimos 2 dias)</h3>
+        <div id="grafico" className="grafico-container">
+          <h3>📈 Variação de Temperatura (últimos 24 registros)</h3>
           {historico.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={historico}>
@@ -143,7 +148,7 @@ const App = () => {
           ) : (
             <p>Carregando gráfico...</p>
           )}
-        </div><br></br>
+        </div><br />
 
         {/* Linha de ID e Atualização */}
         <div className="info-line">
