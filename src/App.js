@@ -14,25 +14,30 @@ const App = () => {
     const fetchDados = async () => {
       try {
         const response = await axios.get('https://api-node-dash-bitdoglab.vercel.app/dados');
-        // Pega os 24 registros mais recentes
-        const dadosOrdenados = response.data
-          .sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em))
-          .slice(0, 24);
+
+        // Ordena do mais recente para o mais antigo
+        const dadosOrdenados = response.data.sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
 
         const ultimoDado = dadosOrdenados[0];
-
         setDados(ultimoDado);
+
         setUltimaAtualizacao(new Date().toLocaleTimeString());
 
-        // Prepara o histórico para o gráfico (ordem do mais antigo para o mais recente)
-        const historicoFiltrado = dadosOrdenados
-          .map(item => ({
-            temperatura: item.temperatura,
-            hora: new Date(item.criado_em).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          }))
-          .reverse();
+        // Pega os últimos 30 registros mais antigos primeiro
+        const ultimos30 = dadosOrdenados
+          .slice(0, 30) // pega os 30 primeiros da lista ordenada pelo mais recente
+          .reverse() // inverte para ficar do mais antigo para o mais recente
+          .map(item => {
+            const data = new Date(item.criado_em);
+            return {
+              temperatura: item.temperatura,
+              hora: data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              dataCompleta: data.toLocaleString(), // data/hora completa para tooltip
+            };
+          });
 
-        setHistorico(historicoFiltrado);
+        setHistorico(ultimos30);
+
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
       }
@@ -134,21 +139,34 @@ const App = () => {
 
         {/* Gráfico de Temperatura */}
         <div id="grafico" className="grafico-container">
-          <h3>📈 Variação de Temperatura (últimos 2 dias)</h3>
+          <h3>📈 Variação de Temperatura (últimos 30 registros)</h3>
           {historico.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={historico}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="hora" tick={{ fontSize: 12 }} />
+                <XAxis
+                  dataKey="hora"
+                  tick={{ fontSize: 12 }}
+                  label={{ value: 'Hora', position: 'insideBottom', offset: -5 }}
+                />
                 <YAxis domain={['auto', 'auto']} />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value) => [`${value} °C`, 'Temperatura']}
+                  labelFormatter={(label, payload) => {
+                    if (payload && payload.length > 0 && payload[0].payload.dataCompleta) {
+                      return `Data/Hora: ${payload[0].payload.dataCompleta}`;
+                    }
+                    return label;
+                  }}
+                />
                 <Line type="monotone" dataKey="temperatura" stroke="#8884d8" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
             <p>Carregando gráfico...</p>
           )}
-        </div><br />
+        </div>
+        <br />
 
         {/* Linha de ID e Atualização */}
         <div className="info-line">
